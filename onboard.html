@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Presto</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/style.css" media="screen">
+  </head>
+
+  <body>
+    <header>
+        <a href="/">
+            <img src="img/logo-dark.png" alt="Presto" class="img" width="250" />
+        </a>
+    </header>
+
+    <br>
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-4 col-sm-push-4">
+          <center>
+            <h1>Complete your Order for $<span id="amt"></span></h1>
+            <h1>
+              <i class="fa fa-lg fa-cc-mastercard"></i>
+              <i class="fa fa-lg fa-cc-visa"></i>
+              <i class="fa fa-lg fa-cc-discover"></i>
+              <i class="fa fa-lg fa-cc-amex"></i>
+            </h1>
+          </center>
+
+          <hr>
+
+          <form id="checkout-form" action="http://benjamins.herokuapp.com/newCustomer" method="post">
+            <div id="error-message"></div>
+
+            <div id="personalInfo">
+              <div class="row">
+                <div class="col-xs-3 form-label">
+                  <p>First Name</p>
+                </div>
+                <div class="col-xs-9">
+                  <input class="form-control" name="first-name"></input>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-xs-3 form-label">
+                  <p>Last Name</p>
+                </div>
+                <div class="col-xs-9">
+                  <input class="form-control" name="last-name"></input>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-xs-3 form-label">
+                  <p>Phone #</p>
+                </div>
+                <div class="col-xs-9">
+                  <input class="form-control" name="phone-number"></input>
+                </div>
+              </div>
+            </div>
+
+            <hr>
+
+            <div class="row">
+              <div class="col-xs-3 form-label">
+                <p>Card #</p>
+              </div>
+              <div class="col-xs-9">
+                <div class="hosted-field form-control" id="card-number"></div>
+              </div>
+            </div>
+
+            <div class="row">  
+              <div class="col-xs-3 form-label">
+                <p>Exp. Date</p>
+              </div>
+              <div class="col-xs-4">
+                <div class="hosted-field form-control" id="expiration-date"></div>
+              </div>
+
+              <div class="col-xs-2 form-label">
+                <p>CVV</p>
+              </div>
+              <div class="col-xs-3">
+                <div class="hosted-field form-control" id="cvv"></div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-xs-3 form-label">
+                <p>Billing Zip</p>
+              </div>
+              <div class="col-xs-9">
+                <div class="hosted-field form-control" id="postal-code"></div>
+              </div>
+            </div>
+
+            <hr>
+
+            <div class="row">
+              <div class="col-xs-12">
+                <i>
+                  <small>We care about your privacy. Payment information is stored securely by Stripe. Your credit card number never touches our servers.</small>
+                </i>
+              </div>
+              <br>
+            </div>
+
+            <input type="hidden" name="payment-method-nonce">
+            <input type="submit" class="btn btn-primary pull-right" value="Complete Order" disabled>
+          </form>
+
+          <small><i>By clicking "Complete Order" you agree to our <a href="/terms.html">terms of service</a></i></small>
+
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <div class="container">
+        <div class="col-sm-4">
+          <img src="img/logo-light.png" alt="Presto" class="img" />
+        </div>
+        <div class="col-sm-4">
+          <center>
+            <h3><a href="mailto:contact@hipresto.com">Contact Us</a></h3>
+            <h3><a href="/about.html">About</a></h3>
+          </center>
+        </div>
+        <div class="col-sm-4">
+
+        </div>
+      </div>
+    </footer>
+    <!-- Load the Client component. -->
+    <script src="https://js.braintreegateway.com/web/3.5.0/js/client.min.js"></script>
+    <!-- Load the Hosted Fields component. -->
+    <script src="https://js.braintreegateway.com/web/3.5.0/js/hosted-fields.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+    <script>
+    function qs(key) {
+      key = key.replace(/[*+?^$.\[\]{}()|\\\/]/g, "\\$&"); // escape RegEx meta chars
+      var match = location.search.match(new RegExp("[?&]"+key+"=([^&]+)(&|$)"));
+      return match && decodeURIComponent(match[1].replace(/\+/g, " "));
+    }
+
+      $(document).ready(function() {
+        $("#amt").html(qs('amt'));
+      });
+
+      $("#rememberCheckbox").click(function(e) {
+        if (!$(this).is(":checked")) {
+          $("#personalInfo").slideUp();
+        } else {
+          $("#personalInfo").slideDown();
+        }
+      });
+
+
+      $.get("http://benjamins.herokuapp.com/client_token", function(data, status) {
+        if (status == 'success') {
+          var authorization = data;
+
+          braintree.client.create({
+            authorization: authorization
+          }, function(clientErr, clientInstance) {
+            if (clientErr) {
+              // Handle error in client creation
+              return;
+            }
+
+            var form = document.querySelector('#checkout-form');
+            var submit = document.querySelector('input[type="submit"]');
+
+            braintree.hostedFields.create({
+              client: clientInstance,
+              styles: {
+                'input': {
+                  'font-size': '14pt'
+                },
+                'input.invalid': {
+                  'color': 'red'
+                },
+                'input.valid': {
+                  'color': 'green'
+                }
+              },
+              fields: {
+                number: {
+                  selector: '#card-number',
+                  placeholder: '0000 0000 0000 0000'
+                },
+                cvv: {
+                  selector: '#cvv',
+                  placeholder: '123'
+                },
+                expirationDate: {
+                  selector: '#expiration-date',
+                  placeholder: 'MM/YYYY'
+                },
+                postalCode: {
+                  selector: '#postal-code',
+                  placeholder: '12345'
+                }
+              }
+            }, function(hostedFieldsErr, hostedFieldsInstance) {
+              if (hostedFieldsErr) {
+                // Handle error in Hosted Fields creation
+                return;
+              }
+
+              submit.removeAttribute('disabled');
+
+              form.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                hostedFieldsInstance.tokenize(function(tokenizeErr, payload) {
+                  if (tokenizeErr) {
+                    // Handle error in Hosted Fields tokenization
+                    return;
+                  }
+
+                  document.querySelector('input[name="payment-method-nonce"]').value = payload.nonce;//payload.nonce;
+                  console.log(payload);
+                  form.submit();
+                });
+              }, false);
+            });
+          });
+        };
+      });
+
+    </script>
+
+    <script src="js/script.js" charset="utf-8"></script>
+  </body>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-86665139-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+</html>
