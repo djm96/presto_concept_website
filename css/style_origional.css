@@ -271,10 +271,8 @@ nav {
     width: 400px;
 	font-size: 22px;
   /*display: inline-block;*/
-    float: right;
-    text-align: left;
-    width: 50%;
-    }
+  /*float: right;*/
+	text-align: left;}
 
 .screenshot {
 	width: 85%;
@@ -303,16 +301,12 @@ nav {
 
 .presto-typed {
   min-height: 99px;
-  /* code for animated blinking cursor */
-  }
+  /* code for animated blinking cursor */ }
   .presto-typed .typed-flexcontainer {
-    /*max-width: 600px;*/
+    max-width: 600px;
     display: flex;
     /*display: inline-block;*/
-    margin: 2em auto;
-    width: 50%;
-    float: left;
-    }
+    margin: 2em auto; }
   .presto-typed .media {
     height: 28px;
     flex-shrink: 0;
@@ -329,15 +323,12 @@ nav {
     padding: 10px 0 10px 15px;
     font-weight: 400;
     font-size: 16px;
-    flex-grow: 1;
-    /*flex-grow: 0;*/
-    }
+    flex-grow: 1; }
   .presto-typed .send {
     height: 32px;
     margin: 6px;
     flex-shrink: 0;
-    align-self: flex-end;
-    }
+    align-self: flex-end; }
   .presto-typed .typed-cursor {
     opacity: 1;
     font-weight: 100;
@@ -390,60 +381,3 @@ nav {
     opacity: 0;
     animation: 0;
     transition: opacity .25s; }
-
-    /******* Media CSS *****/
-
-
-
-@media screen and (max-width: 991px) {
-  .content-small {
-    float: none !important;
-    text-align: left;
-    width: 100%;
-    }
- .presto-typed .typed-flexcontainer {
-    display: flex;
-    margin: 2em auto;
-    width: 100%;
-    float: left;
-    }
-
-.text-center {
-    text-align: center;
-    margin-left: 50px;
-}
-}
-
-@media screen and (max-width: 768px) {
-  .content-small {
-    float: none !important;
-    text-align: left;
-    width: 100%;
-    }
- .presto-typed .typed-flexcontainer {
-    display: flex;
-    margin: 2em auto;
-    width: 100%;
-    float: left;
-    }
-
-.text-center {
-    text-align: center;
-    margin-left: 0px;
-}
-.h3, h3 {
-    font-size: 16px;
-}
-.h1, h1 {
-    font-size: 36px;
-}
-p {
-    font-size: 14px;
-}
-.presto-typed .media {
-    height: 24px;
-    flex-shrink: 0;
-    align-self: flex-end;
-    margin-bottom: 10px;
-}
-}
